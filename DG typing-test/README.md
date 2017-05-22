@@ -1,2 +1,2 @@
 # Typing-Test
-An attempt to make something of similar functionality to this typing game: https://10fastfingers.com/typing-test/english
+As the anchorman for Theta Chi in Anchor Splash 2017, here is my "talent" entry! It's a UCLA DG-themed typing test. Enjoy!
