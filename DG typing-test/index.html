@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Ari Sweedler's typing tester</title>
+	<h1>Welcome! Hello welcome.</h1>
+	<meta name="description" content="A typing test created by Ari Sweedler in Spring of 2017. Made with HTML5 and javascript">
+	<meta name="author" content="Ari Sweedler">
+	<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+	<div id="accuracyOutput">Words correct:
+		<span id="wordsCorrect">0</span>
+		<span> of </span>
+		<span id="wordsSubmitted">0</span>
+	</div>
+
+	<div id="timerPreview">
+		<span>You have </span>
+		<span id="time"></span>
+		<span> seconds left.</span>
+	</div>
+
+	<p id=testPreview>
+		<div id="restOfTest" hidden="hidden"></div>
+	</p>
+
+	<form id="inputForm">
+		Type here: <input id="userInput" type="text" name="userInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeyup=observeInput(event)>
+	</form>
+
+<script type="text/javascript">
+window.addEventListener('keydown',function(e){
+	if(e.keyIdentifier=='U+000A'||e.keyIdentifier=='Enter'||e.keyCode==13){
+		if(e.target.nodeName=='INPUT'&&e.target.type=='text'){
+			e.preventDefault();
+			return false;
+		}
+	}
+},true);
+</script>
+
+<script>
+const TEST_LENGTH = 120;
+const CHARS_IN_ROW_ALLOWED = 50;
+const TIME = 6000;
+const CUR_WORD_COLOR = "yellow";
+document.getElementById("time").innerHTML = TIME;
+
+//into the DOM element "restOfTest", place these 90 words
+generateTest(document.getElementById("restOfTest"), formTestArray(TEST_LENGTH));
+
+//when the user first types, start the timer
+document.getElementById("userInput").addEventListener("input", startTimer);
+
+//I don't like having these here, but I didn't know what else to do
+var dispWordNumber = 1;
+var userWordNumber = 1;
+var wordsSubmitted = 0;
+var wordsCorrect = 0;
+generateDisplayRow();
+generateDisplayRow();
+formatTestPreview();
+
+//I didn't dynamically create the eventListener on my input form/box because its going to be permanent. Also, I used onkeyup instead of input so that I could tell which specific key was pressed. I couldn't figure out how to do that with the "input" event.
+function observeInput(event){
+	var charTyped = String.fromCharCode(event.keyCode);
+	if (meantToEnterWord(charTyped)){
+		wordEntered();
+	} else {
+		formatCurWord();
+	}
+}
+
+function meantToEnterWord(c){
+	if(c !== ' ') {
+		return false;
+	}
+	let charTargetIndex = document.getElementById("userInput").value.length-1;
+	var targetWord = document.getElementById("word " + (userWordNumber)).innerHTML;
+	let noSpaceHere = targetWord.charAt(charTargetIndex) !== ' ';
+	return noSpaceHere;
+}
+
+//I remove the event listener, because if I didn't, then I'd be starting this timer a bunch of times. And if I started the timer 5 times, then it would run out 5 times too fast. It was a weird bug and I didn't get why my timer started zooming towards 0 after a few inputs.
+function startTimer(){
+
+	document.getElementById("userInput").removeEventListener("input", startTimer);
+
+	var clock = setInterval(function() {
+    	var time = document.getElementById("time");
+    	// take one second off
+    	time.innerHTML--;
+
+    	// When the countdown is over...
+    	if (time.innerHTML == "-1") {
+    	    clearInterval(clock);
+    	    document.getElementById("time").innerHTML = "ZERO";
+    	    alert(timesUp());
+    	}
+	}, 1000);
+}
+
+//I've created a span with an ID relative to its position in the test for each word. Now that I have this, all I have to do is display them and check to see if the user types something matching
+function generateTest(domObject, testArray){
+
+	for(let i = 0; i < testArray.length; i++){
+
+		let word = document.createTextNode(testArray[i]);
+		let span = document.createElement("span");
+		span.setAttribute("id", "word " + (i+1));
+		span.appendChild(word);
+		domObject.appendChild(span);
+	}
+}
+
+function generateDisplayRow(){
+	let charsInRow = 0;
+	let row = document.createElement("div");
+
+	while (charsInRow < CHARS_IN_ROW_ALLOWED){
+		let span = document.getElementById("word " + (dispWordNumber++));	//I'm taking advantage of global variables here, we never leave dispWordNumber's scope. This kinda feels weird, but it works, I guess?
+		row.appendChild(span);
+		row.appendChild(document.createTextNode(" "));	//formatting
+		charsInRow += span.innerHTML.length + 1;
+	}
+	document.getElementById("testPreview").appendChild(row);
+}
+
+function wordEntered(){
+	let userBlock = document.getElementById("userInput");
+	let userWord = userBlock.value.substring(0, userBlock.value.length-1);	//discard the space, get only the raw word
+	userBlock.value = "";	//clear their typing, making it look like we took/accepted their input. Now let's process it
+
+	var targetBlock = document.getElementById("word " + (userWordNumber++));	//keep track of the word we're on (globally)
+	var targetWord = targetBlock.innerHTML;
+	document.getElementById("wordsSubmitted").innerHTML++;
+
+	if(userWord === targetWord){
+		document.getElementById("wordsCorrect").innerHTML++;
+		formatOldWord(true);
+	} else {
+		formatOldWord(false);
+	}
+	formatTestPreview();
+}
+
+function formatTestPreview(){
+
+	var testPreview = document.getElementById("testPreview");
+	var lastRow = testPreview.lastChild;
+	var newRowWord = lastRow.firstChild;	//if this is the current word, then we are on a new line!
+	var curWord = document.getElementById("word " + (userWordNumber));
+
+	if (newRowWord == curWord){	//if we're on the last row, then stop displaying the first row and generate a new one
+		testPreview.removeChild(lastRow.previousSibling);
+		generateDisplayRow();
+	}
+
+	formatNewWord();
+}
+
+function formatNewWord(){
+	var curWord = document.getElementById("word " + (userWordNumber));
+	curWord.style.fontWeight = 700;
+	curWord.style.backgroundColor = CUR_WORD_COLOR;
+}
+
+function formatCurWord(){
+	let curBlock = document.getElementById("userInput")
+	let curWord = curBlock.value.substring(0, curBlock.value.length);
+
+	var targetBlock = document.getElementById("word " + (userWordNumber));
+	var targetWord = targetBlock.innerHTML;
+
+	if(curWord == targetWord.substring(0,curWord.length)) {
+		targetBlock.style.backgroundColor = CUR_WORD_COLOR;
+	} else {
+		if (curBlock.value.substring(curBlock.value.length-1) != " "){	//uncertain as to why we enter this function even with " " as the most recently typed key, but this fixes the highlight sometimes flashing red when "entering" words
+			targetBlock.style.backgroundColor = "red";
+		}
+	}
+}
+
+function formatOldWord(correctly){
+	var oldWord = document.getElementById("word " + (userWordNumber-1));
+	oldWord.style.color = correctly?"green":"red";
+	oldWord.style.fontWeight = 300;
+	oldWord.style.backgroundColor = "transparent";
+}
+
+function timesUp(){
+
+	var inputBox = document.getElementById("userInput");
+	inputBox.value="";
+	inputBox.disabled="disabled";
+
+	var wordsCorrect = document.getElementById("wordsCorrect").innerHTML;
+	var wordsSubmitted = document.getElementById("wordsSubmitted").innerHTML;
+	var percentAccuracy = (100*(wordsCorrect/wordsSubmitted)).toFixed(2);
+
+	var congrats = "Congratulations!";
+	var return1 = " You typed " + wordsCorrect + " words correctly out of " + wordsSubmitted+ ".";
+	var return2 = "That's " + wordsCorrect + " words per minute at " + percentAccuracy + " % accuracy";
+
+	var divResults = document.createElement("div");		// Create a <div> element
+	document.body.appendChild(divResults);
+
+	var para = document.createElement("p")
+	var text1 = document.createTextNode(return1 + '\n');	// Create a text node
+	var text2 = document.createTextNode(return2);			// Create a text node
+	para.appendChild(text1);
+	para.appendChild(text2);
+
+	divResults.appendChild(para);
+
+	return (congrats + '\n' + return1 + '\n' + return2);
+}
+
+function formTestArray(numWords){
+	//var wordBank = ['hello', 'goodbye'];
+	var wordBank = ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'pi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'psi', 'chi', 'omega', 'DG', 'Delta Gamma', 'Theta Chi', '1873', 'Oxford', 'Mississippi', 'Lewis', 'Anna Boyd Ellington', 'Mary Comfort Leonard', 'Anna', 'Eva', 'Mary', 'Eva Webb Dodd', 'Do Good', 'anchor', 'splash', 'anchor splash', 'anchorman', 'greek', 'brunch', 'Gayley', 'Strathmore', 'Hilgard', 'Weyburn', 'Le Conte', 'beautiful', 'gorgeous', 'Alpha Sigma', 'alumna', 'diverse', 'talented', 'intelligent', 'accomplished', 'bronze', 'pink', 'blue', 'cream rose', 'rose', 'Golden Anchor', 'UCLA', 'Bruins', 'service', 'Service for Sight', 'Dance Marathon', 'Relay for Life'];
+
+	var returnMe = [];
+
+	for(let i = 0; i < numWords; i++){
+		let randInt = Math.floor(Math.random() * wordBank.length);
+		returnMe.push(wordBank[randInt]);
+	}
+
+	return returnMe;
+}
+
+</script>
+</body>
+
+</html>

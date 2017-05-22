@@ -1,0 +1,15 @@
+Most common english words:
+
+public static void main(String[] args) {
+    Scanner in = new Scanner(System.in);
+    int t = 1000;
+    String output = "{";
+
+    for(int i = 0; i < 1000; i++){
+        output = output + in.next() + ", ";
+    }
+    output = output + "}";
+    System.out.print(output);
+}
+
+{alpha, beta, gamma, delta, epsilon, zeta, eta, theta, iota, kappa, lambda, mu, nu, xi, omicron, pi, rho, sigma, tau, upsilon, phi, psi, chi, omega, DG, Delta Gamma, Theta Chi, 1873, Oxford, Mississippi, Lewis, Anna Boyd Ellington, Mary Comfort Leonard, Anna, Eva, Mary, Eva Webb Dodd, Do Good, anchor, splash, anchor splash, anchorman, greek, brunch, Gayley, Strathmore, Hilgard, Weyburn, Le Conte, beautiful, dimes, Alpha Sigma, alumna, diverse, talented, intelligent, accomplished, bronze, pink, blue, cream rose, Golden Anchor, UCLA, Bruins, service, service for sight, Dance Marathon, Relay for Life}
