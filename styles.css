@@ -35,6 +35,10 @@
   background-color: pink;
 }
 
+.timer{
+  font-size: 24px;
+}
+
 body {
   background-color: #cccccc;
 }
@@ -43,6 +47,8 @@ body {
   animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
+  animation-direction: normal;
+  animation-iteration-count: infinite;
   perspective: 1000px;
 }
 

@@ -22,7 +22,7 @@
 		</td>
 		<td>
 			<div class="heading">
-				<h1>Anchor Splash 2017!</h1>
+				<h1>Anchor Splash 2017</h1>
 				<h5>Here's my talent, from Theta Chi. DG rocks!!</h5>
 			</div>
 		</td>
@@ -40,8 +40,8 @@
 		</div>
 
 		<div class="textDisplay" id="timerPreview">
-			<span id="time"></span>
-			<span> seconds left!</span>
+			<span class="timer" id="time"></span>
+			<span> seconds left</span>
 		</div>
 
 		<div class="textDisplay" class="testPreview">
@@ -228,16 +228,19 @@ function timesUp(){
 
 	var congrats = "Congratulations!";
 	var return1 = " You typed " + wordsCorrect + " words correctly out of " + wordsSubmitted+ ".";
-	var return2 = "That's " + wordsCorrect + " words per minute at " + percentAccuracy + " % accuracy";
+	var return2 = "That's " + wordsCorrect + " words per minute at " + percentAccuracy + " % accuracy.";
+	var return3 = "Nice!"
 
 	var divResults = document.createElement("div");		// Create a <div> element
 	document.body.appendChild(divResults);
 
 	var para = document.createElement("p")
 	var text1 = document.createTextNode(return1 + '\n');	// Create a text node
-	var text2 = document.createTextNode(return2);			// Create a text node
+	var text2 = document.createTextNode(return2 + '\n');			// Create a text node
+	var text3 = document.createTextNode(return3);
 	para.appendChild(text1);
 	para.appendChild(text2);
+	para.appendChild(text3);
 
 	divResults.appendChild(para);
 
